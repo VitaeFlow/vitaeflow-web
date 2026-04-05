@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/home/HeroSection.astro';
+import ProblemSection from '../components/home/ProblemSection.astro';
+import SolutionSection from '../components/home/SolutionSection.astro';
+import AudienceSection from '../components/home/AudienceSection.astro';
+import EcosystemSection from '../components/home/EcosystemSection.astro';
+import CtaSection from '../components/home/CtaSection.astro';
+import SiteHeader from '../components/site/SiteHeader.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+---
+
+<BaseLayout
+  title="VitaeFlow | Human-First PDFs, Machine-Readable Resumes"
+  description="VitaeFlow embeds structured JSON data inside PDF resumes. One file, readable by humans and machines."
+>
+  <SiteHeader />
+
+  <main class="relative overflow-hidden">
+    <HeroSection />
+    <ProblemSection />
+    <SolutionSection />
+    <AudienceSection />
+    <EcosystemSection />
+    <CtaSection />
+  </main>
+
+  <div class="relative w-full overflow-hidden bg-[radial-gradient(circle_at_50%_10%,#38576d,#24374a)] pt-34 pb-10 max-sm:pt-26">
+    <SiteFooter />
+  </div>
+</BaseLayout>

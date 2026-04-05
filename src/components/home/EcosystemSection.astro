@@ -1,0 +1,41 @@
+---
+import { ecosystemItems } from '../../data/home';
+
+const iconMap: Record<string, string> = {
+  spec: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  sdk: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  cli: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+  tools: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+};
+---
+
+<section class="relative mx-auto w-[min(calc(100%-2rem),1260px)] pt-24">
+  <div class="max-w-[44rem]">
+    <span class="inline-flex rounded-full border border-bg-deep/10 bg-white/45 px-3.5 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-bg-deep">
+      Open Source
+    </span>
+    <h2 class="mt-5 text-[clamp(2.05rem,3.15vw,3.15rem)] font-extrabold leading-[0.96] tracking-tighter text-ink text-balance">
+      An ecosystem, not just a spec
+    </h2>
+    <p class="mt-4 max-w-[38rem] text-lg leading-relaxed text-ink-soft">
+      Everything is MIT licensed and built in the open. Use the tools we provide or build your own — the spec is the contract.
+    </p>
+  </div>
+
+  <div class="mt-10 grid grid-cols-4 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1">
+    {ecosystemItems.map((item) => (
+      <a
+        href={item.href}
+        target={item.href.startsWith('http') ? '_blank' : undefined}
+        rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
+        class="group rounded-2xl border border-ink/6 bg-white-soft/80 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-teal/20 hover:shadow-soft"
+      >
+        <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10 text-teal transition-colors duration-300 group-hover:bg-teal/15">
+          <Fragment set:html={iconMap[item.icon]} />
+        </div>
+        <h3 class="text-[0.95rem] font-bold text-ink">{item.name}</h3>
+        <p class="mt-1.5 text-sm leading-relaxed text-ink-soft">{item.description}</p>
+      </a>
+    ))}
+  </div>
+</section>

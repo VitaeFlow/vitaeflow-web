@@ -1,0 +1,39 @@
+---
+import { audienceCards } from '../../data/home';
+import Card from '../ui/Card.astro';
+
+const icons = [
+  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+  `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+];
+---
+
+<section class="relative mx-auto w-[min(calc(100%-2rem),1260px)] pt-24">
+  <div class="max-w-[44rem]">
+    <span class="inline-flex rounded-full border border-bg-deep/10 bg-white/45 px-3.5 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-bg-deep">
+      Who it's for
+    </span>
+    <h2 class="mt-5 text-[clamp(2.05rem,3.15vw,3.15rem)] font-extrabold leading-[0.96] tracking-tighter text-ink text-balance">
+      Built for everyone in the hiring loop
+    </h2>
+    <p class="mt-4 max-w-[38rem] text-lg leading-relaxed text-ink-soft">
+      Whether you send resumes, read them, or build tools around them — VitaeFlow fits into your workflow.
+    </p>
+  </div>
+
+  <div class="mt-10 grid grid-cols-3 gap-5 max-lg:grid-cols-1">
+    {audienceCards.map((card, i) => (
+      <Card>
+        <div class="mb-5 flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10 text-teal">
+          <Fragment set:html={icons[i]} />
+        </div>
+        <span class="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-ink/50">
+          {card.tag}
+        </span>
+        <h3 class="mt-2 text-lg font-bold tracking-tight text-ink">{card.title}</h3>
+        <p class="mt-2.5 text-[0.95rem] leading-relaxed text-ink-soft">{card.description}</p>
+      </Card>
+    ))}
+  </div>
+</section>

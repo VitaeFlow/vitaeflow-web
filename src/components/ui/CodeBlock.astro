@@ -1,0 +1,35 @@
+---
+import { Code } from 'astro:components';
+
+interface Props {
+  code: string;
+  lang?: 'ts' | 'bash' | 'json';
+  title?: string;
+  class?: string;
+}
+
+const { code, lang = 'ts', title, class: className = '' } = Astro.props;
+---
+
+<div class:list={['overflow-hidden rounded-xl vf-code', className]}>
+  {title && (
+    <div class="flex items-center gap-2 border-b border-white/6 bg-[#1a2735] px-4 py-2.5">
+      <span class="h-2.5 w-2.5 rounded-full bg-white/10" />
+      <span class="h-2.5 w-2.5 rounded-full bg-white/10" />
+      <span class="h-2.5 w-2.5 rounded-full bg-white/10" />
+      <span class="ml-2 text-xs font-medium text-white/40">{title}</span>
+    </div>
+  )}
+  <Code code={code.trim()} lang={lang} theme="github-dark" />
+</div>
+
+<style is:global>
+  .vf-code pre.astro-code {
+    background: #1e2d3d !important;
+    padding: 1.25rem !important;
+    margin: 0 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.75 !important;
+    overflow-x: auto !important;
+  }
+</style>

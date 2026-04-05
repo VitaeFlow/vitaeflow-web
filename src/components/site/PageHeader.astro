@@ -1,0 +1,27 @@
+---
+import SiteHeader from './SiteHeader.astro';
+import WaveTransition from '../ui/WaveTransition.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  activePath?: string;
+}
+
+const { title, description, activePath } = Astro.props;
+---
+
+<div class="relative w-full overflow-hidden bg-[radial-gradient(circle_at_60%_-20%,#38576d,#24374a)] pb-28 text-white-soft">
+  <SiteHeader activePath={activePath} variant="transparent" />
+
+  <div class="relative z-10 mx-auto max-w-[1260px] px-4 pt-16 pb-8 sm:px-8">
+    <h1 class="m-0 mb-3 text-[clamp(2.8rem,5vw,3.8rem)] font-extrabold leading-tight tracking-tighter">
+      {title}
+    </h1>
+    <p class="m-0 max-w-[58ch] text-lg leading-relaxed text-white/85">
+      {description}
+    </p>
+  </div>
+
+  <WaveTransition />
+</div>

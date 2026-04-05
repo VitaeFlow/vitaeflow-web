@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/site/PageHeader.astro';
+import WaveFooter from '../../components/ui/WaveFooter.astro';
+import BackToTools from '../../components/ui/BackToTools.astro';
+import InspectTool from '../../components/tools/inspect/InspectTool';
+---
+
+<BaseLayout
+  title="Inspect | VitaeFlow"
+  description="Drop a PDF to detect whether it contains VitaeFlow data. See the sections and raw JSON."
+>
+  <PageHeader
+    title="Inspect"
+    description="Drop a PDF to detect whether it contains VitaeFlow structured data. See the extracted metadata, sections, and raw JSON at a glance."
+    activePath="/tools/"
+  />
+
+  <main class="relative z-1 mx-auto w-[min(calc(100%-2rem),1260px)] py-12">
+    <BackToTools />
+    <InspectTool client:load />
+  </main>
+
+  <WaveFooter />
+</BaseLayout>

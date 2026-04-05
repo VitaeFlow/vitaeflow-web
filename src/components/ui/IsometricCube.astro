@@ -1,0 +1,67 @@
+---
+interface Props {
+  x: number;
+  y: number;
+  scale?: number;
+  w?: number;
+  d?: number;
+  h?: number;
+  topColor: string;
+  leftColor: string;
+  rightColor: string;
+  shadowAngle: number;
+  shadowLength: number;
+  shadowColor?: string;
+  shadowOpacity?: number;
+}
+
+const {
+  x, y,
+  scale = 1,
+  w = 30, d = 15, h = 30,
+  topColor, leftColor, rightColor,
+  shadowAngle,
+  shadowLength,
+  shadowColor = '#bba689',
+  shadowOpacity = 0.5,
+} = Astro.props;
+
+const angleRad = (shadowAngle * Math.PI) / 180;
+const dx = Math.cos(angleRad) * shadowLength;
+const dy = Math.sin(angleRad) * shadowLength;
+
+const base: [number, number][] = [
+  [0, 0], [w, -d], [0, -2 * d], [-w, -d],
+];
+const offset: [number, number][] = base.map(([px, py]) => [px + dx, py + dy]);
+
+function cross(o: [number, number], a: [number, number], b: [number, number]) {
+  return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+}
+const allPts = [...base, ...offset].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+const lower: [number, number][] = [];
+for (const p of allPts) {
+  while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) lower.pop();
+  lower.push(p);
+}
+const upper: [number, number][] = [];
+for (const p of [...allPts].reverse()) {
+  while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) upper.pop();
+  upper.push(p);
+}
+const hull = [...lower.slice(0, -1), ...upper.slice(0, -1)];
+const shadowPath = `M ${hull[0][0]},${hull[0][1]} ${hull.slice(1).map((p) => `L ${p[0]},${p[1]}`).join(' ')} Z`;
+
+const leftPoints = `0,0 ${-w},${-d} ${-w},${-d - h} 0,${-h}`;
+const rightPoints = `0,0 ${w},${-d} ${w},${-d - h} 0,${-h}`;
+const topPoints = `0,${-h} ${-w},${-d - h} 0,${-2 * d - h} ${w},${-d - h}`;
+---
+
+<g transform={`translate(${x}, ${y}) scale(${scale})`}>
+  {shadowOpacity > 0 && (
+    <path fill={shadowColor} d={shadowPath} opacity={shadowOpacity} style="mix-blend-mode: multiply;" />
+  )}
+  <polygon fill={leftColor} points={leftPoints} />
+  <polygon fill={rightColor} points={rightPoints} />
+  <polygon fill={topColor} points={topPoints} />
+</g>

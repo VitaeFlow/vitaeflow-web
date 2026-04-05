@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/site/PageHeader.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import Card from '../../components/ui/Card.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const validateExample = `import { validateResume } from '@vitaeflow/sdk';
+
+const result = validateResume(resume, { mode: 'strict' });
+
+if (result.valid) {
+  console.log('Resume is valid!');
+} else {
+  for (const err of result.errors) {
+    console.log(\`\${err.path}: \${err.message}\`);
+  }
+}`;
+
+const embedExample = `import { embedResume } from '@vitaeflow/sdk';
+import { readFileSync, writeFileSync } from 'fs';
+
+const pdf = new Uint8Array(readFileSync('resume.pdf'));
+const resume = {
+  version: '0.1',
+  profile: 'standard',
+  basics: {
+    givenName: 'Marie',
+    familyName: 'Laurent',
+    email: 'marie@example.com',
+  },
+  work: [{
+    organization: 'TechCorp',
+    position: 'Lead Developer',
+    startDate: '2021-03',
+  }],
+};
+
+const result = await embedResume(pdf, resume);
+writeFileSync('resume.vf.pdf', result);`;
+
+const extractExample = `import { extractResume } from '@vitaeflow/sdk';
+import { readFileSync } from 'fs';
+
+const pdf = new Uint8Array(readFileSync('resume.vf.pdf'));
+const result = await extractResume(pdf);
+
+if (result?.resume) {
+  console.log(result.resume.basics.givenName); // "Marie"
+  console.log(result.validation.valid);        // true
+}`;
+
+const cliExamples = `# Validate a JSON resume
+vitaeflow validate resume.json
+
+# Embed structured data into a PDF
+vitaeflow embed resume.pdf resume.json -o resume.vf.pdf
+
+# Extract data from a VitaeFlow PDF
+vitaeflow extract resume.vf.pdf
+
+# Check if a PDF contains VitaeFlow data
+vitaeflow inspect resume.vf.pdf`;
+---
+
+<BaseLayout
+  title="Getting Started | VitaeFlow"
+  description="Learn how to validate, embed, and extract structured resume data in PDF files with VitaeFlow."
+>
+  <PageHeader
+    title="Getting Started"
+    description="Everything you need to integrate VitaeFlow into your application. From install to working code in under 5 minutes."
+    activePath="/docs/"
+  />
+
+  <main class="relative z-1 mx-auto w-[min(calc(100%-2rem),860px)] py-16">
+
+    <!-- What is VitaeFlow -->
+    <section class="mb-16">
+      <Card hover={false} class="border-teal/10 bg-teal/3">
+        <h2 class="text-lg font-bold text-ink">What is VitaeFlow?</h2>
+        <p class="mt-3 leading-relaxed text-ink-soft">
+          VitaeFlow is an open standard for embedding structured JSON resume data inside PDF files.
+          A VitaeFlow PDF looks like any normal resume to a human reader, but it also contains
+          machine-readable data that ATS, job boards, and HR tools can extract instantly — no parsing, no guessing.
+        </p>
+        <p class="mt-3 leading-relaxed text-ink-soft">
+          The <code class="rounded bg-teal/8 px-1.5 py-0.5 text-sm font-semibold text-teal">.vf.pdf</code> suffix
+          is recommended for discoverability, but not required.
+        </p>
+      </Card>
+    </section>
+
+    <!-- Install -->
+    <section class="mb-16">
+      <div class="mb-4 flex items-center gap-3">
+        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal text-sm font-bold text-white">1</span>
+        <h2 class="text-xl font-bold tracking-tight text-ink">Install the SDK</h2>
+      </div>
+      <p class="mb-5 pl-11 text-ink-soft">Works in Node.js and the browser.</p>
+      <CodeBlock code="npm install @vitaeflow/sdk" lang="bash" />
+    </section>
+
+    <!-- Validate -->
+    <section class="mb-16">
+      <div class="mb-4 flex items-center gap-3">
+        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal text-sm font-bold text-white">2</span>
+        <h2 class="text-xl font-bold tracking-tight text-ink">Validate a resume</h2>
+      </div>
+      <p class="mb-5 pl-11 text-ink-soft">
+        Use <strong>strict</strong> mode to reject unknown fields,
+        or <strong>tolerant</strong> for forward compatibility.
+      </p>
+      <CodeBlock code={validateExample} title="validate.ts" />
+    </section>
+
+    <!-- Embed -->
+    <section class="mb-16">
+      <div class="mb-4 flex items-center gap-3">
+        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal text-sm font-bold text-white">3</span>
+        <h2 class="text-xl font-bold tracking-tight text-ink">Embed in a PDF</h2>
+      </div>
+      <p class="mb-5 pl-11 text-ink-soft">
+        Take a plain PDF and embed structured resume data into it. The resume is validated before embedding.
+      </p>
+      <CodeBlock code={embedExample} title="embed.ts" />
+    </section>
+
+    <!-- Extract -->
+    <section class="mb-16">
+      <div class="mb-4 flex items-center gap-3">
+        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal text-sm font-bold text-white">4</span>
+        <h2 class="text-xl font-bold tracking-tight text-ink">Extract from a PDF</h2>
+      </div>
+      <p class="mb-5 pl-11 text-ink-soft">
+        Read a VitaeFlow PDF and get the structured data back, automatically validated.
+      </p>
+      <CodeBlock code={extractExample} title="extract.ts" />
+    </section>
+
+    <hr class="my-16 border-ink/8" />
+
+    <!-- CLI -->
+    <section class="mb-16">
+      <h2 class="text-xl font-bold tracking-tight text-ink">CLI</h2>
+      <p class="mt-3 mb-5 text-ink-soft">
+        For quick tasks from the terminal.
+      </p>
+      <CodeBlock code="npm install -g vitaeflow" lang="bash" />
+      <CodeBlock code={cliExamples} lang="bash" title="terminal" class="mt-4" />
+    </section>
+
+    <hr class="my-16 border-ink/8" />
+
+    <!-- Schema -->
+    <section class="mb-16">
+      <h2 class="text-xl font-bold tracking-tight text-ink">Schema overview</h2>
+      <p class="mt-3 mb-6 text-ink-soft">
+        Only <code class="rounded bg-teal/8 px-1.5 py-0.5 text-sm font-semibold text-teal">basics</code> is required. Everything else is optional.
+      </p>
+
+      <div class="grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+        <Card hover={false}>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-teal">Required</h3>
+          <ul class="mt-3 space-y-2 text-sm text-ink-soft">
+            <li><code class="font-semibold text-ink">version</code> — schema version</li>
+            <li><code class="font-semibold text-ink">profile</code> — always "standard"</li>
+            <li><code class="font-semibold text-ink">basics</code> — name, email</li>
+          </ul>
+        </Card>
+        <Card hover={false}>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-teal">Optional</h3>
+          <ul class="mt-3 space-y-2 text-sm text-ink-soft">
+            <li>work, education, skills</li>
+            <li>languages, certifications</li>
+            <li>projects, publications</li>
+            <li>volunteer, references, interests</li>
+          </ul>
+        </Card>
+      </div>
+    </section>
+
+    <!-- Next steps -->
+    <section>
+      <h2 class="text-xl font-bold tracking-tight text-ink">Next steps</h2>
+      <div class="mt-6 grid grid-cols-3 gap-4 max-sm:grid-cols-1">
+        <a href="/tools/" class="group rounded-2xl border border-ink/6 bg-white-soft/80 p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <div class="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-teal/10 text-teal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-ink group-hover:text-teal">Try the tools</h3>
+          <p class="mt-1 text-xs text-ink-muted">Inspect, validate, enrich — in the browser.</p>
+        </a>
+        <a href="https://github.com/VitaeFlow/vitaeflow-spec" target="_blank" rel="noreferrer" class="group rounded-2xl border border-ink/6 bg-white-soft/80 p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <div class="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-teal/10 text-teal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-ink group-hover:text-teal">Read the spec</h3>
+          <p class="mt-1 text-xs text-ink-muted">Full JSON schema on GitHub.</p>
+        </a>
+        <a href="https://github.com/VitaeFlow" target="_blank" rel="noreferrer" class="group rounded-2xl border border-ink/6 bg-white-soft/80 p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <div class="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-teal/10 text-teal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-ink group-hover:text-teal">Contribute</h3>
+          <p class="mt-1 text-xs text-ink-muted">Open source. PRs welcome.</p>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="relative w-full overflow-hidden bg-[radial-gradient(circle_at_50%_10%,#38576d,#24374a)] pt-34 pb-10">
+    <SiteFooter />
+  </div>
+</BaseLayout>

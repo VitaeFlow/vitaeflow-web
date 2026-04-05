@@ -1,0 +1,41 @@
+---
+import { Code } from 'astro:components';
+
+interface Props {
+  data: unknown;
+  class?: string;
+}
+
+const { data, class: className = '' } = Astro.props;
+const json = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+---
+
+<div class:list={['overflow-hidden rounded-xl vf-json', className]}>
+  <Code code={json} lang="json" theme="github-dark" />
+</div>
+
+<style is:global>
+  .vf-json pre.astro-code {
+    background: #1e2d3d !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    font-size: 0.78rem !important;
+    line-height: 1.7 !important;
+    border-radius: 0.75rem;
+  }
+
+  /* Keys */
+  .vf-json .astro-code span[style*="color:#79B8FF"] {
+    color: #7a98a6 !important;
+  }
+
+  /* String values */
+  .vf-json .astro-code span[style*="color:#9ECBFF"] {
+    color: #d4e0e5 !important;
+  }
+
+  /* Punctuation: braces, brackets, commas, colons */
+  .vf-json .astro-code span[style*="color:#E1E4E8"] {
+    color: #556b78 !important;
+  }
+</style>

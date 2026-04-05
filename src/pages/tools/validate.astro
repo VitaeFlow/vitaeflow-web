@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/site/PageHeader.astro';
+import WaveFooter from '../../components/ui/WaveFooter.astro';
+import BackToTools from '../../components/ui/BackToTools.astro';
+import ValidateTool from '../../components/tools/validate/ValidateTool';
+---
+
+<BaseLayout
+  title="Validate | VitaeFlow"
+  description="Paste or edit VitaeFlow JSON and validate it against the schema in real time."
+>
+  <PageHeader
+    title="Validate"
+    description="Paste or edit VitaeFlow JSON and validate it against the schema in real time. Switch between strict and tolerant modes."
+    activePath="/tools/"
+  />
+
+  <main class="relative z-1 mx-auto w-[min(calc(100%-2rem),1260px)] py-12">
+    <BackToTools />
+    <ValidateTool client:load />
+  </main>
+
+  <WaveFooter />
+</BaseLayout>
