@@ -1,6 +1,6 @@
 ---
 import { extractResume } from '@vitaeflow/sdk';
-import { readFileSync } from 'fs';
+import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import ExamplesCarousel from './ExamplesCarousel.tsx';
 
@@ -9,13 +9,16 @@ const slugs = ['camille-dubois', 'olivia-wilson', 'rachelle-beaudry', 'helene-ro
 const examples = await Promise.all(
   slugs.map(async (slug) => {
     const pdfPath = resolve('public/examples/pdf', `${slug}.vf.pdf`);
-    const pdf = new Uint8Array(readFileSync(pdfPath));
+    const pdf = new Uint8Array(await readFile(pdfPath));
     const result = await extractResume(pdf);
+    if (!result?.resume?.basics) {
+      throw new Error(`Failed to extract resume from ${slug}.vf.pdf`);
+    }
     return {
       slug,
-      name: `${result!.resume!.basics.givenName} ${result!.resume!.basics.familyName}`,
-      headline: result!.resume!.basics.headline ?? '',
-      json: result!.resume!,
+      name: `${result.resume.basics.givenName} ${result.resume.basics.familyName}`,
+      headline: result.resume.basics.headline ?? '',
+      json: result.resume,
     };
   }),
 );
@@ -47,13 +50,15 @@ const examples = await Promise.all(
   .examples-json .jp {
     color: #556b78;
   }
+  .examples-json .jn {
+    color: #a8c4b8;
+  }
   .examples-json pre {
     margin: 0;
     font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
     color: #8ba4b0;
   }
 
-  /* Scrollbar styling */
   .examples-json ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -74,9 +79,6 @@ const examples = await Promise.all(
   .examples-json {
     scrollbar-color: rgba(122, 152, 166, 0.2) transparent;
     scrollbar-width: thin;
-  }
-  .examples-json .jn {
-    color: #a8c4b8;
   }
 
   @keyframes fadeIn {
