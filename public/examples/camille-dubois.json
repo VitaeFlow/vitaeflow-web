@@ -1,0 +1,83 @@
+{
+  "version": "0.1",
+  "profile": "standard",
+  "lang": "en",
+  "basics": {
+    "givenName": "Camille",
+    "familyName": "Dubois",
+    "headline": "Digital Marketing Manager",
+    "summary": "Digital marketing manager with over 5 years of experience driving growth through SEO, paid acquisition, and content strategy. Managed six-figure ad budgets and built organic traffic channels from the ground up. Equally comfortable with data analysis and creative direction. Google Ads certified.",
+    "email": "camille.dubois@example.com",
+    "phone": "+33698765432",
+    "location": {
+      "city": "Paris",
+      "countryCode": "FR"
+    },
+    "profiles": [
+      { "network": "linkedin", "username": "camilledubois", "url": "https://linkedin.com/in/camilledubois" }
+    ]
+  },
+  "work": [
+    {
+      "organization": "ModeChic",
+      "position": "Digital Marketing Manager",
+      "type": "employment",
+      "startDate": "2022-01",
+      "summary": "Overseeing the full digital marketing strategy for a fashion e-commerce brand, from acquisition to retention.",
+      "highlights": [
+        "SEO/SEA strategy leading to +40% organic traffic",
+        "Managed a yearly ad budget of 200k€"
+      ]
+    },
+    {
+      "organization": "AgencePulse",
+      "position": "Communications Officer",
+      "type": "employment",
+      "startDate": "2019-03",
+      "endDate": "2021-12",
+      "summary": "Managed social media presence and content production for a portfolio of B2C clients across lifestyle and retail.",
+      "highlights": [
+        "Community management for 12 clients",
+        "Video content creation (500k+ cumulative views)"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "CELSA Paris-Sorbonne",
+      "area": "Communications & Marketing",
+      "studyType": "Master's Degree",
+      "startDate": "2017-09",
+      "endDate": "2019-06"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Marketing",
+      "items": [
+        { "name": "SEO/SEA", "level": "expert" },
+        { "name": "Google Analytics", "level": "advanced" },
+        { "name": "Meta Ads", "level": "advanced" }
+      ]
+    },
+    {
+      "category": "Tools",
+      "items": [
+        { "name": "Figma", "level": "intermediate" },
+        { "name": "Notion", "level": "advanced" }
+      ]
+    }
+  ],
+  "languages": [
+    { "language": "French", "code": "fr", "fluency": "native" },
+    { "language": "English", "code": "en", "fluency": "C1" },
+    { "language": "Spanish", "code": "es", "fluency": "B1" }
+  ],
+  "certifications": [
+    {
+      "name": "Google Ads Certification",
+      "issuer": "Google",
+      "date": "2023-03"
+    }
+  ]
+}

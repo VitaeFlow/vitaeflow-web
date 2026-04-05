@@ -1,0 +1,86 @@
+---
+import { extractResume } from '@vitaeflow/sdk';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import ExamplesCarousel from './ExamplesCarousel.tsx';
+
+const slugs = ['camille-dubois', 'olivia-wilson', 'rachelle-beaudry', 'helene-roux'];
+
+const examples = await Promise.all(
+  slugs.map(async (slug) => {
+    const pdfPath = resolve('public/examples/pdf', `${slug}.vf.pdf`);
+    const pdf = new Uint8Array(readFileSync(pdfPath));
+    const result = await extractResume(pdf);
+    return {
+      slug,
+      name: `${result!.resume!.basics.givenName} ${result!.resume!.basics.familyName}`,
+      headline: result!.resume!.basics.headline ?? '',
+      json: result!.resume!,
+    };
+  }),
+);
+---
+
+<section class="relative mx-auto w-[min(calc(100%-2rem),1260px)] pt-24">
+  <div class="max-w-[44rem]">
+    <span class="inline-flex rounded-full border border-bg-deep/10 bg-white/45 px-3.5 py-1.5 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-bg-deep">
+      See it in action
+    </span>
+    <h2 class="mt-5 text-[clamp(2.05rem,3.15vw,3.15rem)] font-extrabold leading-[0.96] tracking-tighter text-ink text-balance">
+      Real resumes, real data
+    </h2>
+    <p class="mt-4 max-w-[38rem] text-lg leading-relaxed text-ink-soft">
+      Different designs, different careers — the same structured data underneath. Pick a resume and see the JSON that any tool can extract from it.
+    </p>
+  </div>
+
+  <ExamplesCarousel client:load examples={examples} />
+</section>
+
+<style is:global>
+  .examples-json .jk {
+    color: #7a98a6;
+  }
+  .examples-json .jv {
+    color: #d4e0e5;
+  }
+  .examples-json .jp {
+    color: #556b78;
+  }
+  .examples-json pre {
+    margin: 0;
+    font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+    color: #8ba4b0;
+  }
+
+  /* Scrollbar styling */
+  .examples-json ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .examples-json ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .examples-json ::-webkit-scrollbar-thumb {
+    background: rgba(122, 152, 166, 0.2);
+    border-radius: 3px;
+  }
+  .examples-json ::-webkit-scrollbar-thumb:hover {
+    background: rgba(122, 152, 166, 0.35);
+  }
+  .examples-json ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  .examples-json {
+    scrollbar-color: rgba(122, 152, 166, 0.2) transparent;
+    scrollbar-width: thin;
+  }
+  .examples-json .jn {
+    color: #a8c4b8;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>

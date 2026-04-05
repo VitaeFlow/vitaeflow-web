@@ -1,0 +1,69 @@
+{
+  "version": "0.1",
+  "profile": "standard",
+  "lang": "fr",
+  "basics": {
+    "givenName": "Hélène",
+    "familyName": "Roux",
+    "headline": "Développement web",
+    "summary": "Web designer avec plus de 5 ans d'expérience en développement web responsive et design UX/UI. Compétente en prototypage, codage et création d'expériences digitales centrées utilisateur. Dynamique, impliquée et bilingue français-anglais.",
+    "email": "hello@reallygreatsite.com",
+    "phone": "+1234567890",
+    "url": "https://www.reallygreatsite.com",
+    "location": {
+      "city": "Any City"
+    },
+    "profiles": [
+      { "network": "instagram", "username": "reallygreatsite", "url": "https://instagram.com/reallygreatsite" }
+    ]
+  },
+  "work": [
+    {
+      "organization": "Entreprise Nomade",
+      "position": "Web Designer Senior",
+      "type": "employment",
+      "startDate": "2020-01",
+      "summary": "Développement de sites web responsives et pilotage de projets front-end pour des clients variés."
+    },
+    {
+      "organization": "Entreprise Borcelle",
+      "position": "Web Designer Junior",
+      "type": "employment",
+      "startDate": "2017-01",
+      "endDate": "2019-12",
+      "summary": "Optimisation de la conception et amélioration de l'expérience utilisateur sur les produits web de l'entreprise."
+    }
+  ],
+  "education": [
+    {
+      "institution": "Ecole de développement",
+      "area": "Développement Web",
+      "studyType": "Certificat",
+      "startDate": "2016-09",
+      "endDate": "2017-06"
+    },
+    {
+      "institution": "Université",
+      "area": "Design Multimédia",
+      "studyType": "Licence",
+      "startDate": "2012-09",
+      "endDate": "2015-06"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Design & Développement",
+      "items": [
+        { "name": "Conception web responsive", "level": "expert" },
+        { "name": "UX/UI design", "level": "expert" },
+        { "name": "Création de maquettes prototypes", "level": "advanced" },
+        { "name": "Maîtrise du codage", "level": "advanced" },
+        { "name": "Gestion de projet", "level": "intermediate" }
+      ]
+    }
+  ],
+  "languages": [
+    { "language": "Français", "code": "fr", "fluency": "native" },
+    { "language": "Anglais", "code": "en", "fluency": "C2" }
+  ]
+}

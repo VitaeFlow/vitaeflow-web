@@ -1,0 +1,84 @@
+{
+  "version": "0.1",
+  "profile": "standard",
+  "lang": "en",
+  "basics": {
+    "givenName": "Olivia",
+    "familyName": "Wilson",
+    "headline": "SEO Specialist",
+    "summary": "SEO Specialist with 5 years of experience in optimizing web content and increasing organic search traffic. Proven track record in improving search engine rankings and enhancing website visibility.",
+    "email": "hello@reallygreatsite.com",
+    "phone": "+1123456789",
+    "url": "https://www.reallygreatsite.com",
+    "location": {
+      "city": "Any City"
+    }
+  },
+  "work": [
+    {
+      "organization": "Aldenaire & Partners",
+      "position": "SEO Specialist",
+      "type": "employment",
+      "startDate": "2020-01",
+      "summary": "Implemented on-page and off-page SEO strategies, resulting in a 30% increase in organic traffic.",
+      "highlights": [
+        "Conducted keyword research and competitor analysis to identify growth opportunities",
+        "Monitored website performance using Software Analytics and Search Console"
+      ]
+    },
+    {
+      "organization": "Giggling Platypus Co.",
+      "position": "SEO Analyst",
+      "type": "employment",
+      "startDate": "2017-05",
+      "endDate": "2019-12",
+      "summary": "Managed SEO campaigns for clients, achieving a 40% improvement in search rankings.",
+      "highlights": [
+        "Improved organic search traffic for Fradel and Spies Co. by 50% within 6 months"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Arowwai Industries University",
+      "area": "Marketing",
+      "studyType": "Bachelor of Science",
+      "startDate": "2012-09",
+      "endDate": "2016-06"
+    }
+  ],
+  "skills": [
+    {
+      "category": "SEO",
+      "items": [
+        { "name": "Keyword Research", "level": "expert" },
+        { "name": "On-Page SEO", "level": "expert" },
+        { "name": "Off-Page SEO", "level": "expert" },
+        { "name": "Technical SEO", "level": "advanced" },
+        { "name": "Content Optimization", "level": "advanced" },
+        { "name": "Link Building", "level": "advanced" }
+      ]
+    },
+    {
+      "category": "Tools & Analysis",
+      "items": [
+        { "name": "SEO Tools", "level": "expert" },
+        { "name": "Data Analysis", "level": "advanced" }
+      ]
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Fauget Analytics Certification",
+      "issuer": "Fauget"
+    },
+    {
+      "name": "Borcelle SEO Certification",
+      "issuer": "Borcelle"
+    },
+    {
+      "name": "Rimberio SEO Toolkit Certification",
+      "issuer": "Rimberio"
+    }
+  ]
+}

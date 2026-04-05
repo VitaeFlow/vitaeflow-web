@@ -1,0 +1,63 @@
+{
+  "version": "0.1",
+  "profile": "standard",
+  "lang": "en",
+  "basics": {
+    "givenName": "Rachelle",
+    "familyName": "Beaudry",
+    "headline": "Graphic Designer",
+    "summary": "Creative and detail-oriented Graphic Designer with a strong passion for visual storytelling and brand identity. Experienced in creating digital and print designs that are visually appealing, functional, and aligned with brand goals. Able to work independently or collaboratively in fast-paced environments.",
+    "email": "hello@reallygreatsite.com",
+    "phone": "+1234567890",
+    "url": "https://www.reallygreatsite.com"
+  },
+  "work": [
+    {
+      "organization": "Studio Shodwe",
+      "position": "Graphic Designer",
+      "type": "employment",
+      "startDate": "2023-01",
+      "endDate": "2026-01",
+      "summary": "Designed social media content, promotional materials, and branding assets. Collaborated with clients to develop visual concepts that match brand identity and marketing objectives."
+    },
+    {
+      "organization": "Salford & Co.",
+      "position": "Junior Graphic Designer",
+      "type": "employment",
+      "startDate": "2022-01",
+      "endDate": "2023-01",
+      "summary": "Assisted in creating marketing visuals, banners, posters, and digital content while ensuring design consistency across platforms."
+    }
+  ],
+  "education": [
+    {
+      "institution": "Borcelle University",
+      "area": "Visual Communication Design",
+      "startDate": "2020-09",
+      "endDate": "2024-06"
+    },
+    {
+      "institution": "Rimberio High School",
+      "area": "Visual Communication Design",
+      "startDate": "2017-09",
+      "endDate": "2020-06"
+    }
+  ],
+  "skills": [
+    {
+      "category": "Design",
+      "items": [
+        { "name": "Graphic Design", "level": "expert" },
+        { "name": "Visual Branding", "level": "advanced" },
+        { "name": "Illustrator", "level": "advanced" },
+        { "name": "Typography", "level": "advanced" },
+        { "name": "UI/UX Basic Design", "level": "intermediate" },
+        { "name": "Social Media Content", "level": "advanced" }
+      ]
+    }
+  ],
+  "languages": [
+    { "language": "Indonesian", "code": "id", "fluency": "native" },
+    { "language": "English", "code": "en", "fluency": "C1" }
+  ]
+}
