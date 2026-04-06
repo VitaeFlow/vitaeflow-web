@@ -1,0 +1,646 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/site/PageHeader.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import Card from '../../components/ui/Card.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+import PdfStructureTree from '../../components/docs/PdfStructureTree.tsx';
+
+const xmpExample = `<?xpacket begin="\\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description rdf:about=""
+      xmlns:vf="urn:vitaeflow:pdfa:resume:1p0#">
+      <vf:DocumentType>RESUME</vf:DocumentType>
+      <vf:Version>0.1</vf:Version>
+      <vf:ConformanceLevel>standard</vf:ConformanceLevel>
+      <vf:Generator>MyApp/1.0</vf:Generator>
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>`;
+
+const filespecExample = `FileSpec Dictionary {
+  Type:            /Filespec
+  F:               (vitaeflow.json)
+  Desc:            (VitaeFlow structured resume data)
+  AFRelationship:  /Alternative
+  EF: {
+    F:  <stream>    % JSON content, UTF-8 encoded
+  }
+}`;
+
+const catalogExample = `Catalog {
+  Names: {
+    EmbeddedFiles: {
+      Names: [
+        (vitaeflow.json)  <FileSpec ref>
+      ]
+    }
+  }
+  AF: [ <FileSpec ref> ]
+  Metadata: <XMP stream ref>
+}`;
+
+const resumeExample = `{
+  "version": "0.1",
+  "profile": "standard",
+  "lang": "en",
+  "basics": {
+    "givenName": "Marie",
+    "familyName": "Laurent",
+    "email": "marie@example.com",
+    "headline": "Lead Developer"
+  },
+  "work": [
+    {
+      "organization": "TechCorp",
+      "position": "Lead Developer",
+      "startDate": "2021-03"
+    }
+  ]
+}`;
+
+const errorExample = `{
+  "valid": false,
+  "errors": [
+    {
+      "path": "/basics",
+      "message": "Missing required property: email"
+    },
+    {
+      "path": "/work/0",
+      "message": "Missing required property: startDate"
+    }
+  ],
+  "warnings": []
+}`;
+---
+
+<BaseLayout
+  title="Specification | VitaeFlow"
+  description="Technical specification for the VitaeFlow open standard — how to embed and extract structured resume data in PDF files."
+>
+  <PageHeader
+    title="Specification"
+    description="Technical reference for implementers. Everything you need to build a VitaeFlow reader or writer in any language."
+    activePath="/docs/"
+  />
+
+  <main class="relative z-1 mx-auto w-[min(calc(100%-2rem),860px)] py-16">
+
+    <!-- Table of contents -->
+    <nav class="mb-16 rounded-2xl border border-ink/6 bg-white-soft/80 p-6">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-teal">On this page</h2>
+      <ol class="mt-4 columns-2 gap-x-8 space-y-2 text-sm max-sm:columns-1">
+        <li><a href="#overview" class="text-ink-soft hover:text-teal transition-colors">1. Overview</a></li>
+        <li><a href="#schema" class="text-ink-soft hover:text-teal transition-colors">2. Schema</a></li>
+        <li><a href="#pdf-embedding" class="text-ink-soft hover:text-teal transition-colors">3. PDF embedding</a></li>
+        <li><a href="#xmp-metadata" class="text-ink-soft hover:text-teal transition-colors">4. XMP metadata</a></li>
+        <li><a href="#extraction" class="text-ink-soft hover:text-teal transition-colors">5. Extraction</a></li>
+        <li><a href="#validation" class="text-ink-soft hover:text-teal transition-colors">6. Validation</a></li>
+        <li><a href="#versioning" class="text-ink-soft hover:text-teal transition-colors">7. Versioning</a></li>
+        <li><a href="#implementation-guide" class="text-ink-soft hover:text-teal transition-colors">8. Implementation guide</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1. Overview -->
+    <section id="overview" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">1. Overview</h2>
+
+      <p class="mt-4 leading-relaxed text-ink-soft">
+        VitaeFlow is an open standard for embedding structured resume data inside PDF files.
+        It uses the <strong>PDF/A-3 associated files</strong> standard (ISO 19005-3) to attach a JSON file inside the PDF —
+        the same standard used by
+        <a href="https://fnfe-mpe.org/factur-x/" target="_blank" rel="noreferrer" class="font-medium text-teal hover:underline">Factur-X</a>
+        for electronic invoices, adapted for resume data.
+      </p>
+
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        A VitaeFlow PDF is a standard PDF that contains an embedded JSON file named
+        <code class="rounded bg-teal/8 px-1.5 py-0.5 text-sm font-semibold text-teal">vitaeflow.json</code>.
+        The PDF remains fully readable by any viewer. Tools that understand VitaeFlow can extract the structured data; others simply ignore it.
+      </p>
+
+      <div class="mt-8 rounded-xl border border-ink/6 bg-white-soft/80 px-6 py-5 text-center font-mono text-sm text-ink-soft">
+        <span class="text-ink font-semibold">Resume PDF</span>
+        <span class="mx-3 text-ink-muted">+</span>
+        <span class="text-ink font-semibold">vitaeflow.json</span>
+        <span class="mx-3 text-ink-muted">=</span>
+        <code class="rounded-lg bg-teal/10 px-2 py-1 font-bold text-teal">.vf.pdf</code>
+      </div>
+
+      <p class="mt-6 leading-relaxed text-ink-soft">
+        The <code class="rounded bg-teal/8 px-1.5 py-0.5 text-sm font-semibold text-teal">.vf.pdf</code> file extension
+        is recommended for discoverability but not required. The embedded data is what makes a PDF a VitaeFlow document, not the filename.
+      </p>
+    </section>
+
+    <!-- 2. Schema -->
+    <section id="schema" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">2. Schema</h2>
+
+      <p class="mt-4 leading-relaxed text-ink-soft">
+        The resume data follows a JSON Schema (draft 2020-12) defined in
+        <a href="https://github.com/VitaeFlow/vitaeflow-spec/blob/main/schema.json" target="_blank" rel="noreferrer" class="font-medium text-teal hover:underline">schema.json</a>.
+        The schema is the source of truth — refer to it for the exhaustive list of fields and constraints.
+      </p>
+
+      <h3 class="mt-8 text-lg font-bold text-ink">Required top-level fields</h3>
+      <div class="mt-4 overflow-hidden rounded-xl border border-ink/6">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-ink/6 bg-cream/40">
+              <th class="px-4 py-3 text-left font-semibold text-ink">Field</th>
+              <th class="px-4 py-3 text-left font-semibold text-ink">Type</th>
+              <th class="px-4 py-3 text-left font-semibold text-ink">Description</th>
+            </tr>
+          </thead>
+          <tbody class="text-ink-soft">
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-semibold text-ink">version</code></td>
+              <td class="px-4 py-3">string</td>
+              <td class="px-4 py-3">Schema version, e.g. <code>"0.1"</code>. Format: <code>major.minor</code></td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-semibold text-ink">profile</code></td>
+              <td class="px-4 py-3">string</td>
+              <td class="px-4 py-3">Always <code>"standard"</code></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3"><code class="font-semibold text-ink">basics</code></td>
+              <td class="px-4 py-3">object</td>
+              <td class="px-4 py-3">Core identity. Requires <code>givenName</code>, <code>familyName</code>, <code>email</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-8 text-lg font-bold text-ink">Optional sections</h3>
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        All other sections are arrays of objects. Include what you have, omit the rest:
+      </p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        {['work', 'education', 'skills', 'languages', 'certifications', 'projects', 'publications', 'volunteer', 'references', 'interests', 'custom'].map(s => (
+          <code class="rounded-lg bg-ink/5 px-2.5 py-1 text-sm font-medium text-ink">{s}</code>
+        ))}
+      </div>
+
+      <h3 class="mt-8 text-lg font-bold text-ink">Shared types</h3>
+      <div class="mt-4 space-y-3 text-sm text-ink-soft">
+        <div class="rounded-xl border border-ink/6 px-4 py-3">
+          <code class="font-semibold text-ink">date</code> —
+          <code>YYYY</code>, <code>YYYY-MM</code>, or <code>YYYY-MM-DD</code>.
+          Pattern: <code class="text-teal">^\d{4}(-(?:0[1-9]|1[0-2])(-(?:0[1-9]|[12]\d|3[01]))?)?$</code>
+        </div>
+        <div class="rounded-xl border border-ink/6 px-4 py-3">
+          <code class="font-semibold text-ink">countryCode</code> —
+          ISO 3166-1 alpha-2, e.g. <code>"FR"</code>, <code>"US"</code>.
+          Pattern: <code class="text-teal">^[A-Z]{2}$</code>
+        </div>
+        <div class="rounded-xl border border-ink/6 px-4 py-3">
+          <code class="font-semibold text-ink">fluency</code> —
+          <code>A1</code> <code>A2</code> <code>B1</code> <code>B2</code> <code>C1</code> <code>C2</code> <code>native</code> <code>bilingual</code>
+        </div>
+        <div class="rounded-xl border border-ink/6 px-4 py-3">
+          <code class="font-semibold text-ink">level</code> —
+          <code>beginner</code> <code>intermediate</code> <code>advanced</code> <code>expert</code>
+        </div>
+      </div>
+
+      <h3 class="mt-8 text-lg font-bold text-ink">Example</h3>
+      <CodeBlock code={resumeExample} lang="json" title="vitaeflow.json" class="mt-4" />
+    </section>
+
+    <!-- 3. PDF Embedding -->
+    <section id="pdf-embedding" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">3. PDF embedding</h2>
+
+      <p class="mt-4 leading-relaxed text-ink-soft">
+        VitaeFlow uses the <strong>PDF/A-3 associated files mechanism</strong> (ISO 19005-3) to embed the JSON data.
+        This is the same standard mechanism used by Factur-X for electronic invoices.
+      </p>
+
+      <Card hover={false} class="mt-8 border-teal/10 bg-teal/3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-teal">Constants</h3>
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="flex gap-3">
+            <span class="w-36 shrink-0 font-semibold text-ink">Filename</span>
+            <code class="text-ink-soft">vitaeflow.json</code>
+          </div>
+          <div class="flex gap-3">
+            <span class="w-36 shrink-0 font-semibold text-ink">MIME type</span>
+            <code class="text-ink-soft">application/json</code>
+          </div>
+          <div class="flex gap-3">
+            <span class="w-36 shrink-0 font-semibold text-ink">AFRelationship</span>
+            <code class="text-ink-soft">/Alternative</code>
+          </div>
+          <div class="flex gap-3">
+            <span class="w-36 shrink-0 font-semibold text-ink">Description</span>
+            <code class="text-ink-soft">VitaeFlow structured resume data</code>
+          </div>
+        </div>
+      </Card>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Interactive overview</h3>
+      <p class="mt-3 mb-6 leading-relaxed text-ink-soft">
+        Explore the PDF internal structure to see where VitaeFlow data lives. Click on any node to expand it and see details.
+      </p>
+      <PdfStructureTree client:load />
+
+      <h3 class="mt-10 text-lg font-bold text-ink">PDF structure</h3>
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        The JSON file is attached to the PDF using two complementary mechanisms: the <strong>EmbeddedFiles</strong> name tree
+        (PDF 1.7, ISO 32000-1 §7.11.4) and the <strong>AF</strong> array (PDF/A-3, ISO 19005-3).
+      </p>
+
+      <CodeBlock code={catalogExample} title="PDF Catalog structure" class="mt-6" />
+
+      <div class="mt-6 space-y-4 text-sm leading-relaxed text-ink-soft">
+        <p>
+          <strong class="text-ink">EmbeddedFiles name tree</strong> — stores the file reference by name. Name trees can be hierarchical
+          (with <code>Kids</code> arrays) or flat (with a <code>Names</code> array). Implementations must handle both. The array contains
+          alternating name/reference pairs: <code>["vitaeflow.json", &lt;ref&gt;]</code>.
+        </p>
+        <p>
+          <strong class="text-ink">AF array</strong> — PDF/A-3 requires the file reference to also appear in the catalog-level
+          <code>AF</code> (Associated Files) array. This enables conforming readers to discover embedded files without traversing the name tree.
+        </p>
+      </div>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">FileSpec dictionary</h3>
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        The file is described by a FileSpec dictionary (PDF 2.0 §7.11.3). The JSON content is stored as a compressed stream
+        in the <code>EF.F</code> entry.
+      </p>
+
+      <CodeBlock code={filespecExample} title="FileSpec structure" class="mt-6" />
+
+      <div class="mt-6 space-y-4 text-sm leading-relaxed text-ink-soft">
+        <p>
+          <strong class="text-ink">AFRelationship</strong> is set to <code>/Alternative</code>, indicating that the embedded file
+          is an alternative representation of the document content — the same resume in a different format.
+        </p>
+        <p>
+          <strong class="text-ink">Stream encoding</strong> — the JSON content must be valid UTF-8. The stream may be compressed
+          using standard PDF filters (typically FlateDecode). Implementations must decompress the stream before parsing.
+        </p>
+      </div>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Embedding steps</h3>
+      <ol class="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">1</span>
+          <span><strong class="text-ink">Validate</strong> the resume data against the schema in <strong>strict</strong> mode. Reject if invalid.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">2</span>
+          <span><strong class="text-ink">Remove</strong> any existing attachment named <code>vitaeflow.json</code> to prevent duplicates.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">3</span>
+          <span><strong class="text-ink">Create</strong> the FileSpec dictionary with the JSON content as a compressed UTF-8 stream.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">4</span>
+          <span><strong class="text-ink">Register</strong> the FileSpec in the EmbeddedFiles name tree and the catalog AF array.</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">5</span>
+          <span><strong class="text-ink">Write</strong> XMP metadata to the document catalog (see next section).</span>
+        </li>
+      </ol>
+    </section>
+
+    <!-- 4. XMP Metadata -->
+    <section id="xmp-metadata" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">4. XMP metadata</h2>
+
+      <p class="mt-4 leading-relaxed text-ink-soft">
+        VitaeFlow writes custom XMP metadata into the PDF's metadata stream. This allows tools to identify VitaeFlow documents
+        and read basic information without extracting and parsing the full JSON attachment.
+      </p>
+
+      <Card hover={false} class="mt-8 border-teal/10 bg-teal/3">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-teal">XMP namespace</h3>
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="flex gap-3">
+            <span class="w-36 shrink-0 font-semibold text-ink">Namespace URI</span>
+            <code class="text-ink-soft break-all">urn:vitaeflow:pdfa:resume:1p0#</code>
+          </div>
+          <div class="flex gap-3">
+            <span class="w-36 shrink-0 font-semibold text-ink">Prefix</span>
+            <code class="text-ink-soft">vf</code>
+          </div>
+        </div>
+      </Card>
+
+      <h3 class="mt-8 text-lg font-bold text-ink">Properties</h3>
+      <div class="mt-4 overflow-hidden rounded-xl border border-ink/6">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-ink/6 bg-cream/40">
+              <th class="px-4 py-3 text-left font-semibold text-ink">Property</th>
+              <th class="px-4 py-3 text-left font-semibold text-ink">Value</th>
+              <th class="px-4 py-3 text-left font-semibold text-ink">Source</th>
+            </tr>
+          </thead>
+          <tbody class="text-ink-soft">
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-semibold text-ink">DocumentType</code></td>
+              <td class="px-4 py-3"><code>"RESUME"</code></td>
+              <td class="px-4 py-3">Constant</td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-semibold text-ink">Version</code></td>
+              <td class="px-4 py-3">e.g. <code>"0.1"</code></td>
+              <td class="px-4 py-3">From <code>resume.version</code></td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-semibold text-ink">ConformanceLevel</code></td>
+              <td class="px-4 py-3"><code>"standard"</code></td>
+              <td class="px-4 py-3">From <code>resume.profile</code></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3"><code class="font-semibold text-ink">Generator</code></td>
+              <td class="px-4 py-3">e.g. <code>"MyApp/1.0"</code></td>
+              <td class="px-4 py-3">From <code>resume.meta.generator</code> or SDK default</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-8 text-lg font-bold text-ink">XMP template</h3>
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        If the PDF already contains XMP metadata, merge the VitaeFlow properties into the existing RDF block.
+        If no XMP exists, create a new metadata stream with this structure:
+      </p>
+      <CodeBlock code={xmpExample} title="XMP metadata" class="mt-4" />
+    </section>
+
+    <!-- 5. Extraction -->
+    <section id="extraction" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">5. Extraction</h2>
+
+      <h3 class="mt-6 text-lg font-bold text-ink">Detection</h3>
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        To quickly check if a PDF contains VitaeFlow data without parsing the JSON:
+      </p>
+      <ol class="mt-4 space-y-2 text-sm leading-relaxed text-ink-soft">
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">1</span>
+          <span>Navigate to <code>Catalog → Names → EmbeddedFiles</code></span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">2</span>
+          <span>Traverse the name tree (handle both <code>Names</code> and <code>Kids</code> nodes)</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">3</span>
+          <span>Look for an entry named exactly <code>"vitaeflow.json"</code> (case-sensitive)</span>
+        </li>
+      </ol>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Full extraction</h3>
+      <ol class="mt-4 space-y-2 text-sm leading-relaxed text-ink-soft">
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">1</span>
+          <span>Locate the FileSpec for <code>vitaeflow.json</code> in the EmbeddedFiles name tree</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">2</span>
+          <span>Read the stream from <code>FileSpec → EF → F</code></span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">3</span>
+          <span>Decompress the stream (handle FlateDecode and other PDF filters)</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">4</span>
+          <span>Decode bytes as UTF-8 and parse as JSON</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/10 text-xs font-bold text-teal">5</span>
+          <span>Validate the parsed data in <strong>tolerant</strong> mode</span>
+        </li>
+      </ol>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Error handling</h3>
+      <div class="mt-4 space-y-3 text-sm text-ink-soft">
+        <div class="rounded-xl border border-ink/6 px-4 py-3">
+          <strong class="text-ink">No embedded file found</strong> — return <code>null</code>. The PDF is not a VitaeFlow document.
+        </div>
+        <div class="rounded-xl border border-ink/6 px-4 py-3">
+          <strong class="text-ink">JSON parse failure</strong> — return a validation error. The file is corrupt or not valid JSON.
+        </div>
+        <div class="rounded-xl border border-ink/6 px-4 py-3">
+          <strong class="text-ink">Validation failure</strong> — return the parsed data alongside the validation errors.
+          A tolerant reader should still surface the data even if some fields are invalid.
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Validation -->
+    <section id="validation" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">6. Validation</h2>
+
+      <p class="mt-4 leading-relaxed text-ink-soft">
+        VitaeFlow defines two validation modes to balance strictness during writing with flexibility during reading.
+      </p>
+
+      <div class="mt-8 grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+        <Card hover={false}>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-teal">Strict mode</h3>
+          <p class="mt-3 text-sm leading-relaxed text-ink-soft">
+            Used when <strong>writing</strong> (embedding). Rejects unknown fields at any level via
+            <code>additionalProperties: false</code>. Ensures the data conforms exactly to the schema.
+          </p>
+          <p class="mt-2 text-xs text-ink-muted">
+            An implementation must validate in strict mode before embedding.
+          </p>
+        </Card>
+        <Card hover={false}>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-teal">Tolerant mode</h3>
+          <p class="mt-3 text-sm leading-relaxed text-ink-soft">
+            Used when <strong>reading</strong> (extracting). Strips all <code>additionalProperties: false</code>
+            constraints, allowing unknown fields to pass through. Enables forward compatibility.
+          </p>
+          <p class="mt-2 text-xs text-ink-muted">
+            A v0.1 reader can read a v0.2 document without failing on new fields.
+          </p>
+        </Card>
+      </div>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Error format</h3>
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        Validation errors use <strong>JSON Pointer</strong> paths (RFC 6901) and human-readable messages:
+      </p>
+      <CodeBlock code={errorExample} lang="json" title="validation result" class="mt-4" />
+    </section>
+
+    <!-- 7. Versioning -->
+    <section id="versioning" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">7. Versioning</h2>
+
+      <p class="mt-4 leading-relaxed text-ink-soft">
+        The schema follows an <strong>additive-only</strong> evolution model:
+      </p>
+
+      <ul class="mt-4 space-y-2 text-sm leading-relaxed text-ink-soft">
+        <li class="flex gap-3">
+          <span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-teal"></span>
+          <span>New <strong>optional</strong> fields and enum values may be added in minor versions</span>
+        </li>
+        <li class="flex gap-3">
+          <span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-teal"></span>
+          <span>Fields are <strong>never removed or renamed</strong></span>
+        </li>
+        <li class="flex gap-3">
+          <span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-teal"></span>
+          <span>A reader supporting v1.x can read any v1.0+ document</span>
+        </li>
+      </ul>
+
+      <p class="mt-6 leading-relaxed text-ink-soft">
+        When a reader encounters a document with a <strong>newer</strong> schema version than it supports,
+        it should emit a warning but still attempt to extract and return the data. This is the purpose of tolerant mode.
+      </p>
+
+      <div class="mt-6 rounded-xl border border-ink/6 bg-cream/30 px-5 py-4 text-sm text-ink-soft">
+        <strong class="text-ink">Version comparison:</strong> parse <code>version</code> as <code>major.minor</code> integers.
+        If the document's version is greater than the implementation's supported version, emit:
+        <code class="mt-2 block text-xs text-ink-muted">"Resume uses schema version X.Y, but this SDK supports A.B. Some fields may not be validated."</code>
+      </div>
+    </section>
+
+    <!-- 8. Implementation Guide -->
+    <section id="implementation-guide" class="mb-20 scroll-mt-8">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">8. Implementation guide</h2>
+
+      <p class="mt-4 leading-relaxed text-ink-soft">
+        To build a VitaeFlow implementation in a new language, your library needs to handle three concerns:
+        PDF manipulation, schema validation, and XMP metadata.
+      </p>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Checklist</h3>
+
+      <div class="mt-6 space-y-4">
+        <div class="rounded-xl border border-ink/6 bg-white-soft/80 p-5">
+          <h4 class="text-sm font-bold text-ink">PDF operations</h4>
+          <ul class="mt-3 space-y-2 text-sm text-ink-soft">
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Read and write PDF 1.7+ files</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Navigate EmbeddedFiles name trees (flat and hierarchical)</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Create FileSpec dictionaries with embedded streams</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Manage the catalog AF array</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Decompress streams (FlateDecode at minimum)</li>
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-ink/6 bg-white-soft/80 p-5">
+          <h4 class="text-sm font-bold text-ink">Schema validation</h4>
+          <ul class="mt-3 space-y-2 text-sm text-ink-soft">
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Support JSON Schema 2020-12</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Compile in strict mode (<code>additionalProperties: false</code> enforced)</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Compile in tolerant mode (<code>additionalProperties: false</code> removed)</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Validate <code>format</code> keywords: <code>email</code>, <code>uri</code></li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Return all errors, not just the first</li>
+          </ul>
+        </div>
+
+        <div class="rounded-xl border border-ink/6 bg-white-soft/80 p-5">
+          <h4 class="text-sm font-bold text-ink">XMP metadata</h4>
+          <ul class="mt-3 space-y-2 text-sm text-ink-soft">
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Create RDF/XML with the VitaeFlow namespace</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Merge into existing XMP if present</li>
+            <li class="flex gap-2"><span class="text-teal">&#10003;</span> Handle XML entity escaping (<code>&amp;</code>, <code>&lt;</code>, <code>&gt;</code>)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Expected behavior</h3>
+      <div class="mt-4 overflow-hidden rounded-xl border border-ink/6">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-ink/6 bg-cream/40">
+              <th class="px-4 py-3 text-left font-semibold text-ink">Function</th>
+              <th class="px-4 py-3 text-left font-semibold text-ink">Behavior</th>
+            </tr>
+          </thead>
+          <tbody class="text-ink-soft">
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3 font-medium text-ink">embed</td>
+              <td class="px-4 py-3">Validate strict → remove existing → attach JSON → write XMP → return PDF bytes</td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3 font-medium text-ink">extract</td>
+              <td class="px-4 py-3">Find attachment → decompress → parse JSON → validate tolerant → return data + validation</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3 font-medium text-ink">detect</td>
+              <td class="px-4 py-3">Check EmbeddedFiles name tree for <code>"vitaeflow.json"</code> → return boolean</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-10 text-lg font-bold text-ink">Reference constants</h3>
+      <div class="mt-4 overflow-hidden rounded-xl border border-ink/6">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-ink/6 bg-cream/40">
+              <th class="px-4 py-3 text-left font-semibold text-ink">Constant</th>
+              <th class="px-4 py-3 text-left font-semibold text-ink">Value</th>
+            </tr>
+          </thead>
+          <tbody class="text-ink-soft">
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-medium text-ink">FILENAME</code></td>
+              <td class="px-4 py-3"><code>vitaeflow.json</code></td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-medium text-ink">MIME_TYPE</code></td>
+              <td class="px-4 py-3"><code>application/json</code></td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-medium text-ink">AF_RELATIONSHIP</code></td>
+              <td class="px-4 py-3"><code>/Alternative</code></td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-medium text-ink">XMP_NAMESPACE</code></td>
+              <td class="px-4 py-3"><code>urn:vitaeflow:pdfa:resume:1p0#</code></td>
+            </tr>
+            <tr class="border-b border-ink/4">
+              <td class="px-4 py-3"><code class="font-medium text-ink">XMP_PREFIX</code></td>
+              <td class="px-4 py-3"><code>vf</code></td>
+            </tr>
+            <tr>
+              <td class="px-4 py-3"><code class="font-medium text-ink">SCHEMA_VERSION</code></td>
+              <td class="px-4 py-3"><code>0.1</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Links -->
+    <section>
+      <h2 class="text-xl font-bold tracking-tight text-ink">Resources</h2>
+      <div class="mt-6 grid grid-cols-2 gap-4 max-sm:grid-cols-1">
+        <a href="https://github.com/VitaeFlow/vitaeflow-spec" target="_blank" rel="noreferrer" class="group rounded-2xl border border-ink/6 bg-white-soft/80 p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <h3 class="text-sm font-bold text-ink group-hover:text-teal">JSON Schema</h3>
+          <p class="mt-1 text-xs text-ink-muted">Source of truth for all field definitions.</p>
+        </a>
+        <a href="https://github.com/VitaeFlow/vitaeflow-js" target="_blank" rel="noreferrer" class="group rounded-2xl border border-ink/6 bg-white-soft/80 p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
+          <h3 class="text-sm font-bold text-ink group-hover:text-teal">Reference implementation</h3>
+          <p class="mt-1 text-xs text-ink-muted">JavaScript/TypeScript SDK on GitHub.</p>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="relative w-full overflow-hidden bg-[radial-gradient(circle_at_50%_10%,#38576d,#24374a)] pt-34 pb-10">
+    <SiteFooter />
+  </div>
+</BaseLayout>
