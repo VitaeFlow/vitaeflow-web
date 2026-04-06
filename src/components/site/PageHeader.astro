@@ -4,7 +4,7 @@ import WaveTransition from '../ui/WaveTransition.astro';
 
 interface Props {
   title: string;
-  description: string;
+  description?: string;
   activePath?: string;
 }
 
@@ -18,9 +18,11 @@ const { title, description, activePath } = Astro.props;
     <h1 class="m-0 mb-3 text-[clamp(2.8rem,5vw,3.8rem)] font-extrabold leading-tight tracking-tighter">
       {title}
     </h1>
-    <p class="m-0 max-w-[58ch] text-lg leading-relaxed text-white/85">
-      {description}
-    </p>
+    {description && (
+      <p class="m-0 max-w-[58ch] text-lg leading-relaxed text-white/85">
+        {description}
+      </p>
+    )}
   </div>
 
   <WaveTransition />

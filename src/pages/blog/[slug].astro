@@ -1,0 +1,147 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/site/PageHeader.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import { formatDate } from '../../utils/date';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const date = formatDate(post.data.date);
+---
+
+<BaseLayout
+  title={`${post.data.title} | VitaeFlow`}
+  description={post.data.description}
+>
+  <PageHeader
+    title={post.data.headline}
+    activePath="/blog/"
+  />
+
+  <main class="relative z-1 mx-auto w-[min(calc(100%-2rem),720px)] py-16">
+    <p class="mb-2 text-sm text-ink-muted">
+      Published <time datetime={date.datetime}>{date.display}</time>
+    </p>
+
+    <p class="mb-12 text-[clamp(1.8rem,4vw,2.5rem)] font-extrabold leading-tight tracking-tighter text-ink">
+      {post.data.title}
+    </p>
+
+    <article class="prose">
+      <Content />
+    </article>
+  </main>
+
+  <div class="relative w-full overflow-hidden bg-[radial-gradient(circle_at_50%_10%,#38576d,#24374a)] pt-34 pb-10 max-sm:pt-26">
+    <SiteFooter />
+  </div>
+</BaseLayout>
+
+<style>
+  .prose {
+    color: var(--color-ink-soft);
+    line-height: 1.75;
+  }
+
+  .prose :global(h2) {
+    color: var(--color-ink);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .prose :global(h3) {
+    color: var(--color-ink);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose :global(p) {
+    margin-bottom: 1rem;
+  }
+
+  .prose :global(strong) {
+    color: var(--color-ink);
+  }
+
+  .prose :global(a) {
+    color: var(--color-teal);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-teal) 30%, transparent);
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+
+  .prose :global(a:hover) {
+    color: var(--color-teal-dark);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .prose :global(li) {
+    margin-bottom: 0.5rem;
+    list-style-type: disc;
+  }
+
+  .prose :global(ol li) {
+    list-style-type: decimal;
+  }
+
+  .prose :global(code) {
+    background: color-mix(in srgb, var(--color-teal) 8%, transparent);
+    color: var(--color-teal);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+  }
+
+  .prose :global(pre) {
+    background: var(--color-code-bg);
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 6%, transparent);
+    padding: 1.5rem;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  .prose :global(pre code) {
+    background: none;
+    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 400;
+    padding: 0;
+  }
+
+  .prose :global(hr) {
+    border-color: color-mix(in srgb, var(--color-ink) 8%, transparent);
+    margin: 2.5rem 0;
+  }
+
+  .prose :global(blockquote) {
+    border-left: 3px solid var(--color-teal-muted);
+    padding-left: 1rem;
+    color: var(--color-ink-muted);
+    font-style: italic;
+    margin-bottom: 1rem;
+  }
+</style>

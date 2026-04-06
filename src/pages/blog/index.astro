@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/site/PageHeader.astro';
+import SiteFooter from '../../components/site/SiteFooter.astro';
+import Card from '../../components/ui/Card.astro';
+import { formatDate } from '../../utils/date';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<BaseLayout
+  title="Blog | VitaeFlow"
+  description="Articles about VitaeFlow, the open standard for machine-readable resumes."
+>
+  <PageHeader
+    title="Blog"
+    description="Updates, deep dives, and thoughts on the future of machine-readable resumes."
+    activePath="/blog/"
+  />
+
+  <main class="relative z-1 mx-auto w-[min(calc(100%-2rem),860px)] py-16">
+
+    <div class="space-y-4">
+      {posts.map((post) => {
+        const date = formatDate(post.data.date);
+        return (
+          <a href={`/blog/${post.id}/`} class="group block">
+            <Card>
+              <time datetime={date.datetime} class="text-sm text-ink-muted">
+                {date.display}
+              </time>
+              <h2 class="mt-2 text-xl font-bold tracking-tight text-ink group-hover:text-teal">
+                {post.data.title}
+              </h2>
+              <p class="mt-2 leading-relaxed text-ink-soft">
+                {post.data.description}
+              </p>
+            </Card>
+          </a>
+        );
+      })}
+    </div>
+
+  </main>
+
+  <div class="relative w-full overflow-hidden bg-[radial-gradient(circle_at_50%_10%,#38576d,#24374a)] pt-34 pb-10 max-sm:pt-26">
+    <SiteFooter />
+  </div>
+</BaseLayout>

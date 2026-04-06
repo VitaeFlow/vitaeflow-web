@@ -7,6 +7,7 @@ export interface NavLink {
 
 export const primaryNav: NavLink[] = [
   { label: 'Tools', href: '/tools/' },
+  { label: 'Blog', href: '/blog/' },
   { label: 'GitHub', href: 'https://github.com/VitaeFlow', external: true },
   { label: 'Getting Started', href: '/docs/', cta: true },
 ];
