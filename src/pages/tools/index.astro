@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/site/PageHeader.astro';
 import SiteFooter from '../../components/site/SiteFooter.astro';
 import Card from '../../components/ui/Card.astro';
-import { toolSteps, toolCards, devToolCards } from '../../data/tools';
+import { toolCards, devToolCards } from '../../data/tools';
 ---
 
 <BaseLayout
@@ -18,45 +18,23 @@ import { toolSteps, toolCards, devToolCards } from '../../data/tools';
 
   <main class="relative z-1 mx-auto w-[min(calc(100%-2rem),1260px)] py-12">
 
-    <!-- How it works -->
-    <section class="mb-16">
-      <h2 class="text-2xl font-bold tracking-tight text-ink">How it works</h2>
-      <p class="mt-1 text-ink-soft">Three steps to go from a plain PDF to a machine-readable resume.</p>
-
-      <div class="mt-8 flex flex-col gap-6">
-        {toolSteps.map((step) => (
-          <div class="flex items-start gap-5">
-            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal text-lg font-bold text-white">
-              {step.n}
-            </span>
-            <div>
-              <h3 class="text-lg font-bold text-ink">{step.title}</h3>
-              <p class="mt-1 leading-relaxed text-ink-soft">{step.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
     <!-- Tool cards -->
     <section class="mb-16">
-      <h2 class="text-2xl font-bold tracking-tight text-ink">Interactive tools</h2>
-      <p class="mt-1 text-ink-soft">Browser-based, client-side. No data is uploaded.</p>
+      <h2 class="text-2xl font-bold tracking-tight text-ink">Pick the tool that fits your need</h2>
+      <p class="mt-1 text-ink-soft">Three independent utilities, all running in your browser. No data is uploaded.</p>
 
       <div class="mt-8 grid grid-cols-3 gap-5 max-lg:grid-cols-1">
         {toolCards.map((tool) => (
-          <Card hover={false} class={tool.featured ? 'relative border-2 border-teal/20' : ''}>
-            {tool.featured && (
-              <span class="absolute top-4 right-4 rounded-full bg-teal/10 px-3 py-1 text-xs font-bold text-teal">Start here</span>
-            )}
-            <h3 class="flex items-center gap-3 text-lg font-bold">
+          <Card hover={false} class="flex h-full flex-col">
+            <span class="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-teal">{tool.audience}</span>
+            <h3 class="mt-2 flex items-center gap-3 text-lg font-bold">
               <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-teal/10 text-teal">
                 <Fragment set:html={tool.icon} />
               </span>
               {tool.name}
             </h3>
             <p class="mt-3 text-sm leading-relaxed text-ink-soft" set:html={tool.description} />
-            <a href={tool.href} class="mt-5 inline-block text-sm font-semibold text-teal hover:underline">Open {tool.name} tool</a>
+            <a href={tool.href} class="mt-auto pt-5 inline-block text-sm font-semibold text-teal hover:underline">Open {tool.name} tool</a>
           </Card>
         ))}
       </div>
@@ -69,13 +47,13 @@ import { toolSteps, toolCards, devToolCards } from '../../data/tools';
 
       <div class="mt-8 grid grid-cols-2 gap-5 max-lg:grid-cols-1">
         {devToolCards.map((tool) => (
-          <Card hover={false}>
+          <Card hover={false} class="flex h-full flex-col">
             <h3 class="flex items-center gap-3 text-lg font-bold">
               <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-navy/10 font-mono text-sm font-bold text-navy">{tool.badge}</span>
               {tool.name}
             </h3>
             <p class="mt-3 text-sm leading-relaxed text-ink-soft">{tool.description}</p>
-            <a href={tool.href} target="_blank" rel="noreferrer" class="mt-5 inline-block text-sm font-semibold text-teal hover:underline">View on GitHub</a>
+            <a href={tool.href} target="_blank" rel="noreferrer" class="mt-auto pt-5 inline-block text-sm font-semibold text-teal hover:underline">View on GitHub</a>
           </Card>
         ))}
       </div>
