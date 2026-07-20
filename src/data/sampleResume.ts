@@ -1,7 +1,7 @@
 import type { Resume } from '@vitaeflow/sdk';
 
 export const sampleResume: Resume = {
-  version: '0.1',
+  version: '0.2',
   profile: 'standard',
   lang: 'en',
   basics: {

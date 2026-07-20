@@ -12,7 +12,7 @@ const xmpExample = `<?xpacket begin="\\uFEFF" id="W5M0MpCehiHzreSzNTczkc9d"?>
     <rdf:Description rdf:about=""
       xmlns:vf="urn:vitaeflow:pdfa:resume:1p0#">
       <vf:DocumentType>RESUME</vf:DocumentType>
-      <vf:Version>0.1</vf:Version>
+      <vf:Version>0.2</vf:Version>
       <vf:ConformanceLevel>standard</vf:ConformanceLevel>
       <vf:Generator>MyApp/1.0</vf:Generator>
     </rdf:Description>
@@ -43,7 +43,7 @@ const catalogExample = `Catalog {
 }`;
 
 const resumeExample = `{
-  "version": "0.1",
+  "version": "0.2",
   "profile": "standard",
   "lang": "en",
   "basics": {
@@ -56,7 +56,10 @@ const resumeExample = `{
     {
       "organization": "TechCorp",
       "position": "Lead Developer",
-      "startDate": "2021-03"
+      "startDate": "2021-03",
+      "extensions": {
+        "com.linkedin": { "positionId": "abc123" }
+      }
     }
   ]
 }`;
@@ -110,8 +113,8 @@ const errorExample = `{
 
       <p class="mt-4 leading-relaxed text-ink-soft">
         VitaeFlow is an open standard for embedding structured resume data inside PDF files.
-        It uses the <strong>PDF/A-3 associated files</strong> standard (ISO 19005-3) to attach a JSON file inside the PDF —
-        the same standard used by
+        It uses the <strong>associated files mechanism used by PDF/A-3</strong> (ISO 19005-3) to attach a JSON file inside the PDF —
+        the same mechanism used by
         <a href="https://fnfe-mpe.org/factur-x/" target="_blank" rel="noreferrer" class="font-medium text-teal hover:underline">Factur-X</a>
         for electronic invoices, adapted for resume data.
       </p>
@@ -160,7 +163,7 @@ const errorExample = `{
             <tr class="border-b border-ink/4">
               <td class="px-4 py-3"><code class="font-semibold text-ink">version</code></td>
               <td class="px-4 py-3">string</td>
-              <td class="px-4 py-3">Schema version, e.g. <code>"0.1"</code>. Format: <code>major.minor</code></td>
+              <td class="px-4 py-3">Schema version, e.g. <code>"0.2"</code>. Format: <code>major.minor</code></td>
             </tr>
             <tr class="border-b border-ink/4">
               <td class="px-4 py-3"><code class="font-semibold text-ink">profile</code></td>
@@ -178,13 +181,36 @@ const errorExample = `{
 
       <h3 class="mt-8 text-lg font-bold text-ink">Optional sections</h3>
       <p class="mt-3 leading-relaxed text-ink-soft">
-        All other sections are arrays of objects. Include what you have, omit the rest:
+        Resume sections are arrays of objects. Include what you have, omit the rest:
       </p>
       <div class="mt-3 flex flex-wrap gap-2">
-        {['work', 'education', 'skills', 'languages', 'certifications', 'projects', 'publications', 'volunteer', 'references', 'interests', 'custom'].map(s => (
+        {['work', 'education', 'skills', 'languages', 'certifications', 'projects', 'publications', 'volunteer', 'references', 'interests'].map(s => (
           <code class="rounded-lg bg-ink/5 px-2.5 py-1 text-sm font-medium text-ink">{s}</code>
         ))}
       </div>
+
+      <h3 class="mt-8 text-lg font-bold text-ink">Extensions</h3>
+      <p class="mt-3 leading-relaxed text-ink-soft">
+        Every structured VitaeFlow object accepts an optional <code>extensions</code> object for domain-specific data.
+        Keys use reverse-DNS namespaces to avoid collisions, and values may contain any JSON data.
+      </p>
+      <CodeBlock
+        code={`{
+  "organization": "TechCorp",
+  "position": "Lead Developer",
+  "startDate": "2021-03",
+  "extensions": {
+    "com.linkedin": { "positionId": "abc123" },
+    "fr.francetravail": { "romeCode": "M1805" }
+  }
+}`}
+        lang="json"
+        title="contextual extensions"
+        class="mt-4"
+      />
+      <p class="mt-3 text-sm leading-relaxed text-ink-muted">
+        Readers must ignore extensions they do not understand. Unknown properties outside <code>extensions</code> remain invalid in strict mode.
+      </p>
 
       <h3 class="mt-8 text-lg font-bold text-ink">Shared types</h3>
       <div class="mt-4 space-y-3 text-sm text-ink-soft">
@@ -217,8 +243,8 @@ const errorExample = `{
       <h2 class="text-2xl font-bold tracking-tight text-ink">3. PDF embedding</h2>
 
       <p class="mt-4 leading-relaxed text-ink-soft">
-        VitaeFlow uses the <strong>PDF/A-3 associated files mechanism</strong> (ISO 19005-3) to embed the JSON data.
-        This is the same standard mechanism used by Factur-X for electronic invoices.
+        VitaeFlow uses the <strong>associated files mechanism used by PDF/A-3</strong> (ISO 19005-3) to embed the JSON data.
+        This is the same mechanism used by Factur-X for electronic invoices.
       </p>
 
       <Card hover={false} class="mt-8 border-teal/10 bg-teal/3">
@@ -241,6 +267,15 @@ const errorExample = `{
             <code class="text-ink-soft">VitaeFlow structured resume data</code>
           </div>
         </div>
+      </Card>
+
+      <Card hover={false} class="mt-6 border-sand/50 bg-sand-light/50">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-ink">PDF/A-3 conformance</h3>
+        <p class="mt-3 text-sm leading-relaxed text-ink-soft">
+          A VitaeFlow writer must create the embedded file and associated-file references described here, but that alone does not make
+          the output PDF/A-3 compliant. Full PDF/A-3 conformance also depends on the source PDF and archival requirements such as
+          PDF/A identification metadata, output intents, embedded fonts, encryption restrictions, and validation with a dedicated PDF/A checker.
+        </p>
       </Card>
 
       <h3 class="mt-10 text-lg font-bold text-ink">Interactive overview</h3>
@@ -354,7 +389,7 @@ const errorExample = `{
             </tr>
             <tr class="border-b border-ink/4">
               <td class="px-4 py-3"><code class="font-semibold text-ink">Version</code></td>
-              <td class="px-4 py-3">e.g. <code>"0.1"</code></td>
+              <td class="px-4 py-3">e.g. <code>"0.2"</code></td>
               <td class="px-4 py-3">From <code>resume.version</code></td>
             </tr>
             <tr class="border-b border-ink/4">
@@ -467,7 +502,7 @@ const errorExample = `{
             constraints, allowing unknown fields to pass through. Enables forward compatibility.
           </p>
           <p class="mt-2 text-xs text-ink-muted">
-            A v0.1 reader can read a v0.2 document without failing on new fields.
+            A v0.2 reader can read a v0.3 document without failing on new fields.
           </p>
         </Card>
       </div>
@@ -484,7 +519,7 @@ const errorExample = `{
       <h2 class="text-2xl font-bold tracking-tight text-ink">7. Versioning</h2>
 
       <p class="mt-4 leading-relaxed text-ink-soft">
-        The schema follows an <strong>additive-only</strong> evolution model:
+        After v1.0, the schema follows an <strong>additive-only</strong> evolution model. Draft 0.x releases may contain documented breaking changes:
       </p>
 
       <ul class="mt-4 space-y-2 text-sm leading-relaxed text-ink-soft">
@@ -616,7 +651,7 @@ const errorExample = `{
             </tr>
             <tr>
               <td class="px-4 py-3"><code class="font-medium text-ink">SCHEMA_VERSION</code></td>
-              <td class="px-4 py-3"><code>0.1</code></td>
+              <td class="px-4 py-3"><code>0.2</code></td>
             </tr>
           </tbody>
         </table>
