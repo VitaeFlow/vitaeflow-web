@@ -44,12 +44,12 @@ const tree: TreeNode = {
           icon: '📋',
           tag: 'PDF/A-3',
           tagColor: 'blue',
-          detail: 'Associated Files array (ISO 19005-3). Contains references to all associated FileSpec objects. Required for PDF/A-3 conformance.',
+          detail: 'Associated Files array (ISO 19005-3). Contains references to all associated FileSpec objects. This is one requirement used by PDF/A-3 readers, not full PDF/A-3 conformance by itself.',
           children: [
             {
               label: 'FileSpec ref',
               icon: '📎',
-              detail: 'Same FileSpec reference as in EmbeddedFiles. Dual registration ensures compatibility with both PDF 1.7 and PDF/A-3 readers.',
+              detail: 'Same FileSpec reference as in EmbeddedFiles. Dual registration supports both PDF 1.7 readers and readers that understand PDF/A-3 associated files.',
             },
           ],
         },
@@ -70,8 +70,8 @@ const tree: TreeNode = {
             {
               label: 'vf:Version',
               icon: '·',
-              detail: 'Schema version from the resume data, e.g. "0.1".',
-              tag: '"0.1"',
+              detail: 'Schema version from the resume data, e.g. "0.2".',
+              tag: '"0.2"',
               tagColor: 'gray',
             },
             {
@@ -84,7 +84,7 @@ const tree: TreeNode = {
             {
               label: 'vf:Generator',
               icon: '·',
-              detail: 'The tool that created this document, e.g. "@vitaeflow/sdk/0.1".',
+              detail: 'The tool that created this document, e.g. "@vitaeflow/sdk/0.2".',
               tag: 'optional',
               tagColor: 'gray',
             },
@@ -133,7 +133,7 @@ const tree: TreeNode = {
           detail: 'The embedded file stream containing the actual JSON data, UTF-8 encoded and typically compressed with FlateDecode.',
           children: [
             {
-              label: '{ "version": "0.1", "profile": "standard", "basics": { ... }, "work": [ ... ] }',
+              label: '{ "version": "0.2", "profile": "standard", "basics": { ... }, "work": [ ... ] }',
               icon: '{ }',
               detail: 'The resume data as a JSON object, following the VitaeFlow schema.',
             },

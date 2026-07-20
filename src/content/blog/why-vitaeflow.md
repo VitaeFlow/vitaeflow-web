@@ -15,7 +15,7 @@ The root cause isn't bad software. It's that **PDF is a visual format, not a dat
 
 ## What if the PDF carried its own data?
 
-There's a feature of the PDF specification that most people don't know about: **PDF/A-3 allows embedding file attachments inside a PDF.** The PDF looks and behaves exactly the same — but it carries additional files that software can read.
+There's a feature of the PDF specification that most people don't know about: **the associated-files mechanism used by PDF/A-3 allows data files to travel inside a PDF.** The PDF looks and behaves exactly the same — but it carries additional files that software can read. Using this mechanism alone does not make the document fully PDF/A-3 compliant.
 
 This isn't new or experimental. The European Union already uses this mechanism at scale for electronic invoicing ([Factur-X](https://factur-x.org)/[ZUGFeRD](https://www.ferd-net.de/standards/zugferd/index.html)): a PDF invoice that humans can read, with embedded XML data that accounting systems can extract instantly. It's proven, it scales, and it's mandatory for B2B invoices in France.
 
@@ -27,7 +27,7 @@ The embedded JSON follows a defined schema:
 
 ```json
 {
-  "version": "0.1",
+  "version": "0.2",
   "profile": "standard",
   "basics": {
     "givenName": "Marie",

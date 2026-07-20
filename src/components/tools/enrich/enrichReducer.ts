@@ -145,7 +145,7 @@ export function assembleResume(state: EnrichState): Resume {
   const { activeSections } = state;
 
   const resume: Resume = {
-    version: '0.1',
+    version: '0.2',
     profile: 'standard',
     basics: state.basics as Basics,
     meta: {
